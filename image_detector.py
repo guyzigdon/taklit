@@ -12,16 +12,17 @@ class ImageDetector:
     GPT_IMAGE_URL_PREAMBLE = "data:image/jpeg;base64,"
 
     def __init__(self) -> None:
-        self.client = OpenAI()
+        self.client = OpenAI(api_key=API_KEY)
     
     def detect_image(self, image_data: bytes) -> VinylInformation:
-        raw_information = ImageDetector._get_raw_vinyl_information(image_data)
+        import pdb; pdb.set_trace()
+        raw_information = self._get_raw_vinyl_information(image_data)
         return VinylInformation.from_raw_information(raw_information)
 
 
     def _get_raw_vinyl_information(self, image_data: bytes) -> str:
         response = self.client.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "user",
