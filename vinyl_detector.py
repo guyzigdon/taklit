@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from PIL import Image
+import argparse
 import time
 from skimage.metrics import structural_similarity as ssim
 from gemini_detector.gemini_detector import detect_vinyl
@@ -20,12 +21,17 @@ def image_has_changed(img1_array, img2_array, threshold=0.90):
     return ssim_index < threshold
 
 def main():
+    parser = argparse.ArgumentParser(description='Detect vinyl records using a webcam.')
+    parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without making changes', default=True, required=False)
+    args = parser.parse_args()
+
     # TODO: figure out why fps is so slow
-    capture_interval = 0.5  # Time between captures in seconds
+    capture_interval = 3  # Time between captures in seconds
     save_path = "captured_image.jpg"  # Path where the image will be saved
     
     # Initialize webcam
     cap = cv2.VideoCapture(0)
+    time.sleep(4)
     
     if not cap.isOpened():
         print("Error: Could not open webcam.")
@@ -46,18 +52,20 @@ def main():
             # Convert frame to RGB and store as numpy array
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
-            if last_image_array is None or image_has_changed(last_image_array, frame_rgb):
+            if last_image_array is None or image_has_changed(last_image_array, frame_rgb) or True:
                 # Save the new image
                 pil_image = Image.fromarray(frame_rgb)
                 pil_image.save(save_path)
                 print(f"Image changed. Saving image to {save_path}")
-                result = detect_vinyl(save_path)
-                print(result)
+                if not args.dry_run:
+                    import pdb; pdb.set_trace()
+                    result = detect_vinyl(save_path)
+                    print(result)
 
             
             last_image_array = frame_rgb
             end = time.time()
-            # print(f"Time elapsed: {end - start}")
+            print(f"Time elapsed: {end - start}")
             # Wait before capturing the next image
             time.sleep(capture_interval)
     
