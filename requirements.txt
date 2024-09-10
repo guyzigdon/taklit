@@ -1,0 +1,4 @@
+lyricsgenius
+google-generativeai
+openai==1.44.1
+pytest
