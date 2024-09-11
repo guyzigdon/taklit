@@ -4,7 +4,7 @@ from PIL import Image
 import argparse
 import time
 from skimage.metrics import structural_similarity as ssim
-from gemini_detector.gemini_detector import detect_vinyl
+from detectors.gemini_detector import detect_vinyl
 
 def image_has_changed(img1_array, img2_array, threshold=0.90):
     """Check if the new image is different from the saved image with a tolerance threshold."""
