@@ -1,12 +1,12 @@
 import sounddevice as sd
-from detectors.audio_detector import detect_song
+from detectors.audio_detector import get_song_info
 import wavio
 import time
 
 # Configuration
 SAMPLE_RATE = 44100  # Sample rate in Hz
 DURATION = 5  # Duration of each recording in seconds
-INTERVAL = 100  # Interval between recordings in seconds
+INTERVAL = 15  # Interval between recordings in seconds
 OUTPUT_FILE_PREFIX = "recording_"
 
 def process_audio(data, filename):
@@ -31,7 +31,7 @@ def record_audio():
 
     # Save to file
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    filename = f"{OUTPUT_FILE_PREFIX}{timestamp}.wav"
+    filename = f"{OUTPUT_FILE_PREFIX}.wav"
     process_audio(recording, filename)
     return filename
 
@@ -42,7 +42,9 @@ def main():
     while True:
         filename = record_audio()
         print(f"Waiting {INTERVAL} seconds before next recording.")
-        result = detect_song(filename)
+        result = get_song_info(filename)
+        print(result)
+        print(result.get_current_and_next_lines())
         time.sleep(INTERVAL)
 
 if __name__ == "__main__":
