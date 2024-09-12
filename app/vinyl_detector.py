@@ -7,27 +7,24 @@ from skimage.metrics import structural_similarity as ssim
 from detectors.gemini_detector import detect_vinyl
 
 def image_has_changed(img1_array, img2_array, threshold=0.90):
-    """Check if the new image is different from the saved image with a tolerance threshold."""
     if img1_array is None:
         return True
 
-    # Convert images to grayscale for SSIM comparison
     img1_gray = cv2.cvtColor(img1_array, cv2.COLOR_RGB2GRAY)
     img2_gray = cv2.cvtColor(img2_array, cv2.COLOR_RGB2GRAY)
     
-    # Compute SSIM between two images
     ssim_index, _ = ssim(img1_gray, img2_gray, full=True)
     
     return ssim_index < threshold
 
 def main():
     parser = argparse.ArgumentParser(description='Detect vinyl records using a webcam.')
-    parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without making changes', default=True, required=False)
+    parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without querying gemini', default=True, required=False)
     args = parser.parse_args()
 
-    # TODO: figure out why fps is so slow
-    capture_interval = 3  # Time between captures in seconds
-    save_path = "captured_image.jpg"  # Path where the image will be saved
+    # TODO: figure out why fps is so low
+    capture_interval = 3  
+    save_path = "captured_image.jpg"
     
     # Initialize webcam
     cap = cv2.VideoCapture(0)
@@ -41,7 +38,7 @@ def main():
     
     try:
         while True:
-            # messure iteration time
+            # measure iteration time
             start = time.time()
 
             ret, frame = cap.read()
@@ -49,11 +46,9 @@ def main():
                 print("Error: Could not read frame.")
                 break
             
-            # Convert frame to RGB and store as numpy array
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
             if last_image_array is None or image_has_changed(last_image_array, frame_rgb) or True:
-                # Save the new image
                 pil_image = Image.fromarray(frame_rgb)
                 pil_image.save(save_path)
                 print(f"Image changed. Saving image to {save_path}")
@@ -66,7 +61,6 @@ def main():
             last_image_array = frame_rgb
             end = time.time()
             print(f"Time elapsed: {end - start}")
-            # Wait before capturing the next image
             time.sleep(capture_interval)
     
     except KeyboardInterrupt:

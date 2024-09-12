@@ -17,7 +17,6 @@ class TimedLyrics:
 
     @classmethod
     def from_raw_data(cls, raw_data):
-         # Regular expression to capture timestamp and lyric
         pattern = re.compile(r'\[(\d{2}):(\d{2})\.(\d{2})\] (.+)')
         
         rows = []
