@@ -5,3 +5,4 @@ pytest
 opencv-python
 pillow
 scikit-image
+sounddevice

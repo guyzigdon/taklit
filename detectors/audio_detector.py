@@ -2,7 +2,7 @@ import requests
 from models.song_information import SongInformation
 
 api_token = '49cc751b8e9de310756bbed451098b8f'
-def get_song_info(file_path):
+def detect_song(file_path):
     url = 'https://api.audd.io/'
     data = {
         'api_token': api_token,
