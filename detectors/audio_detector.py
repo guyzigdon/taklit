@@ -14,6 +14,5 @@ def detect_song(file_path):
     }
     
     response = requests.post(url, data=data, files=files)
-    import pdb; pdb.set_trace()
     response = response.json().get('result')
     return SongInformation.from_json({"title": response.get('title'), "lyrics": response.get('lyrics').get('lyrics'), "current_time": response.get('timecode')})

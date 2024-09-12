@@ -1,5 +1,5 @@
 from detectors.gemini_detector import detect_vinyl
-from detectors.audio_detection import get_song_info
+from detectors.audio_detector import detect_song
 from models.vinyl_information import VinylInformation
 from models.song_information import SongInformation
 
