@@ -1,13 +1,16 @@
 import sounddevice as sd
 from detectors.audio_detector import get_song_info
+from thread_utils import print_in_color
 import wavio
+import argparse
 import time
 
 # Configuration
 SAMPLE_RATE = 44100  # Sample rate in Hz
 DURATION = 5  # Duration of each recording in seconds
-INTERVAL = 15  # Interval between recordings in seconds
+DEFAULT_INTERVAL = 15  # Interval between recordings in seconds
 OUTPUT_FILE_PREFIX = "recording_"
+
 
 def process_audio(data, filename):
     print(f"Processing audio data. Saving to {filename}.")
@@ -23,22 +26,31 @@ def record_audio():
     recording = sd.rec(int(DURATION * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=2, dtype='int16')
     sd.wait()  # Wait until recording is finished
 
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    # timestamp = time.strftime("%Y%m%d_%H%M%S")
     filename = f"{OUTPUT_FILE_PREFIX}.wav"
     process_audio(recording, filename)
     return filename
 
-def main():
+def run_main_loop(interval : int = DEFAULT_INTERVAL, color= None):
     """
     Main loop to record audio at specified intervals.
     """
+    if color is not None:
+        globals()['print'] = print_in_color(color)
+
+    print("Starting main loop.")
+
     while True:
         filename = record_audio()
-        print(f"Waiting {INTERVAL} seconds before next recording.")
         result = get_song_info(filename)
         print(result)
-        print(result.get_current_and_next_lines())
-        time.sleep(INTERVAL)
+        if result is not None:
+            print(result.get_current_and_next_lines())
+        print(f"Waiting {interval} seconds before next recording.")
+        time.sleep(interval)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Detect vinyl records using a webcam.')
+    parser.add_argument('--interval', type=int, help='Interval between image captures in seconds', default=DEFAULT_INTERVAL, required=False)
+    args = parser.parse_args()
+    run_main_loop(args.interval)
