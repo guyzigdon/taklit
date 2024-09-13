@@ -4,11 +4,12 @@ from thread_utils import print_in_color
 import wavio
 import argparse
 import time
+from colorama import Fore
 
 # Configuration
 SAMPLE_RATE = 44100  # Sample rate in Hz
 DURATION = 5  # Duration of each recording in seconds
-DEFAULT_INTERVAL = 15  # Interval between recordings in seconds
+DEFAULT_INTERVAL = 10  # Interval between recordings in seconds
 OUTPUT_FILE_PREFIX = "recording_"
 
 
@@ -43,9 +44,12 @@ def run_main_loop(interval : int = DEFAULT_INTERVAL, color= None):
     while True:
         filename = record_audio()
         result = get_song_info(filename)
-        print(result)
         if result is not None:
-            print(result.get_current_and_next_lines())
+            print(Fore.GREEN + result.title + ", lyrics:")
+            lyrics = "\n".join([row.text for row in result.get_current_and_next_lines() if row is not None])
+            if lyrics == "":
+                lyrics = "\u266C"
+            print(Fore.GREEN + lyrics)
         print(f"Waiting {interval} seconds before next recording.")
         time.sleep(interval)
 

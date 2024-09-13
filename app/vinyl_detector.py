@@ -5,9 +5,10 @@ import time
 from skimage.metrics import structural_similarity as ssim
 from detectors.gemini_detector import detect_vinyl
 from thread_utils import print_in_color
+from colorama import Fore
 
 DEFAULT_INTERVAL = 7
-DEFAULT_DRY_RUN = True
+DEFAULT_QUERY_VINYL = False
 
 
 def image_has_changed(img1_array, img2_array, threshold=0.70):
@@ -21,7 +22,7 @@ def image_has_changed(img1_array, img2_array, threshold=0.70):
     return (ssim_index < threshold, ssim_index)
 
 
-def run_main_loop(dry_run : bool = DEFAULT_DRY_RUN, interval : int = DEFAULT_INTERVAL, color = None):
+def run_main_loop(query_vinyl : bool = DEFAULT_QUERY_VINYL, interval : int = DEFAULT_INTERVAL, color = None):
     if color is not None:
         globals()['print'] = print_in_color(color)
     save_path = "captured_image.jpg"
@@ -53,10 +54,10 @@ def run_main_loop(dry_run : bool = DEFAULT_DRY_RUN, interval : int = DEFAULT_INT
                 pil_image = Image.fromarray(frame_rgb)
                 pil_image.save(save_path)
                 print(f"Image changed. Saving image to {save_path}. {ssim_index=}")
-                if not dry_run:
-                    import pdb; pdb.set_trace()
+                if query_vinyl:
                     result = detect_vinyl(save_path)
-                    print(result)
+                    if result is not None:
+                        print(Fore.GREEN + result.album_name + " " + result.artist)
 
             
             last_image_array = frame_rgb
@@ -80,7 +81,7 @@ def run_main_loop(dry_run : bool = DEFAULT_DRY_RUN, interval : int = DEFAULT_INT
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Detect vinyl records using a webcam.')
-    parser.add_argument('--dry-run', action='store_true', help='Perform a dry run without querying gemini', default=DEFAULT_DRY_RUN, required=False)
+    parser.add_argument('--query_vinyl', action='store_true', help='Perform a dry run without querying gemini', default=DEFAULT_QUERY_VINYL, required=False)
     parser.add_argument('--interval', type=int, help='Interval between image captures in seconds', default=DEFAULT_INTERVAL, required=False)
     args = parser.parse_args()
-    run_main_loop(args.dry_run, args.interval)
+    run_main_loop(args.query_vinyl, args.interval)
