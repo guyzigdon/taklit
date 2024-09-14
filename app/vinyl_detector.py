@@ -26,7 +26,7 @@ def image_has_changed(img1_array, img2_array, threshold=0.70):
 def run_main_loop(query_vinyl : bool = DEFAULT_QUERY_VINYL, interval : int = DEFAULT_INTERVAL, color = None):
     if color is not None:
         globals()['print'] = print_in_color(color)
-    save_path = "aa.jpg"
+    save_path = "capture_image.jpg"
     
     # Initialize webcam
     cap = cv2.VideoCapture(0)

@@ -27,30 +27,52 @@
 </head>
 
 <body>
-    <div id="main"></div>
+    <div id="main">
+        <div id="vinyl"></div>
+        <div id="song"></div>
+    </div>
     <script>
-        function getContainer() {
-            return document.getElementById("main");
+        function getContainer(name) {
+            return document.getElementById(name);
         }
 
         function onEnd(text) {
-            getContainer().textContent = text
+            getContainer("main").textContent = text
+        }
+
+        function onVinyl(vinyl) {
+            const tracklist = vinyl.tracklist || []
+
+            return `
+                <h1>${vinyl.album_name}</h1>
+                <h2>${vinyl.artist}</h2>
+                <h3>${vinyl.year}</h3>
+                <h3>${vinyl.genre}</h3>
+                <div>${tracklist.map(track => `<span>${track}</span>`).join("<br>")}</div>
+            `
+        }
+
+        function onSong(song) {
+            return `
+                <h1>${song.title}</h1>
+                <div></div>
+            `
         }
 
         function onData(data) {
-            const tracklist = data.tracklist || []
 
             const animatedContainer = document.createElement('div')
             animatedContainer.classList.add("animated")
-            animatedContainer.innerHTML = `
-                <h1>${data.album_name}</h1>
-                <h2>${data.artist}</h2>
-                <h3>${data.year}</h3>
-                <h3>${data.genre}</h3>
-                <div>${tracklist.map(track => `<span>${track}</span>`).join("<br>")}</div>
-            `
 
-            const container = getContainer()
+            let container;
+            if (data.data_type === "vinyl") {
+                container = getContainer("vinyl")
+                animatedContainer.innerHTML = onVinyl(data)
+            } else {
+                container = getContainer("song")
+                animatedContainer.innerHTML = onSong(data)
+            }
+
             container.innerHTML = ""
             container.appendChild(animatedContainer)
 

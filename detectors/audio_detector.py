@@ -28,6 +28,7 @@ def detect_song_audd_io(file_path):
 
 shazam = Shazam()
 async def detect_song_shazamio(file_path):
+    import pdb; pdb.set_trace()
     shazam_result = await shazam.recognize(file_path)
     if shazam_result['matches'] == []:
         return None
@@ -69,6 +70,7 @@ def get_timed_lyrics(song_info : SongInformation):
 async def get_song_info(file_path):
     song_info = await detect_song_shazamio(file_path)
     if song_info is None:
+        print('None')
         return None
     timed_lyrics = get_timed_lyrics(song_info)
     song_info.timed_lyrics = timed_lyrics

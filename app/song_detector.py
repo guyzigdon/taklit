@@ -7,6 +7,7 @@ import asyncio
 import argparse
 import time
 from colorama import Fore
+from display.client import DisplayClient
 
 # Configuration
 SAMPLE_RATE = 44100  # Sample rate in Hz
@@ -59,6 +60,7 @@ async def run_main_loop(interval: int = DEFAULT_INTERVAL, color=None):
             if lyrics == "":
                 lyrics = "\u266C"
             print(Fore.GREEN + lyrics)
+            DisplayClient.set_data(result)
         print(f"Waiting {interval} seconds before next recording.")
         time.sleep(interval)
 

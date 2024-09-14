@@ -1,9 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 from flask_sock import Sock
 
-from models.vinyl_information import VinylInformation
-
-
 app = Flask(__name__)
 sock = Sock(app)
 
@@ -34,16 +31,14 @@ def post_data():
     global clients
     try:
         # Parse JSON data from the request
-        json_data = request.json
-        # Validate and parse JSON data using Pydantic
-        data = VinylInformation(**json_data)
+        json_data = request.data.decode("utf-8")
 
         # Send message to all connected WebSocket clients
         for client in clients:
-            client.send(data.model_dump_json())
+            client.send(json_data)
 
         # Return the validated data as a JSON response
-        return jsonify(data.model_dump()), 201
+        return jsonify(json_data), 201
 
     except Exception as e:
         print(e)

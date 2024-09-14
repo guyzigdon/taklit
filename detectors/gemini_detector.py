@@ -20,7 +20,7 @@ genai.configure(api_key=api_key)
 
 def detect_vinyl(image_path: str) -> Optional[VinylInformation]:
     print("querying gemini for vinyl information")
-    myfile = genai.upload_file("img.jpg")
+    myfile = genai.upload_file("main.jpg")
     model = genai.GenerativeModel("gemini-1.5-flash")
     result = model.generate_content([myfile, "\n\n", heb])
     try:

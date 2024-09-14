@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import Dict, List
 
 class VinylInformation(BaseModel):
+    data_type: str = "vinyl"
     artist: str
     album_name: str
     genre: str

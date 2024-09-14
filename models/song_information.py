@@ -1,10 +1,9 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 from typing import Optional, List
 import re
 import math 
 
-@dataclass
-class TimedRow:
+class TimedRow(BaseModel):
     start_time: int # seconds
     text: str
 
@@ -12,8 +11,7 @@ class TimedRow:
         return self.start_time == other.start_time and self.text == other.text
 
 
-@dataclass
-class TimedLyrics:
+class TimedLyrics(BaseModel):
     rows: List[TimedRow]
 
     @classmethod
@@ -35,8 +33,8 @@ class TimedLyrics:
         return True
 
 
-@dataclass
-class SongInformation:
+class SongInformation(BaseModel):
+    data_type: str = "song"
     title: str
     lyrics: str
     album: str
