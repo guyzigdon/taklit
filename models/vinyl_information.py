@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, List
 
 @dataclass
 class VinylInformation:
@@ -9,7 +9,7 @@ class VinylInformation:
     album_name: str
     genre: str
     year: int
-    tracklist: list[str] = None
+    tracklist: List[str] = None
 
     @classmethod
     def from_raw_information(cls, raw_information: Dict) -> VinylInformation:

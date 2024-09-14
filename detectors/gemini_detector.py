@@ -2,7 +2,7 @@
 import google.generativeai as genai
 import os
 import json
-from vinyl_information import VinylInformation
+from models.vinyl_information import VinylInformation
 
 
 api_key = "AIzaSyDRoHdj88R67pXpPWfP-Ij4EXR52pFellw"
