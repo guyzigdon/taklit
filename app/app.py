@@ -10,6 +10,7 @@ from colorama import Fore, init
 import asyncio
 import concurrent.futures
 
+from display import start_display_server
 
 init(autoreset=True)
 
@@ -22,16 +23,14 @@ def run_async_in_thread(loop, coro):
 
 def main(vinyl_dry_run, vinyl_interval, song_interval):
     song_loop = asyncio.new_event_loop()
-    vinyl_loop = asyncio.new_event_loop()    
+    vinyl_loop = asyncio.new_event_loop()
+    start_display_server()
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         # Schedule both async tasks to run in separate threads
         song_future = executor.submit(run_async_in_thread, song_loop, run_song_detector(song_interval, Fore.BLUE))
         vinyl_future = executor.submit(run_async_in_thread, vinyl_loop, run_vinyl_detector(vinyl_dry_run, vinyl_interval, Fore.CYAN))
 
-        # Wait for both async functions to complete
-        song_future.result()
-        vinyl_future.result()
 
 
 if __name__ == '__main__':

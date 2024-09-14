@@ -1,3 +1,7 @@
+pydantic==2.9.1
+pywebview==5.2
+Flask==3.0.3
+flask-sock==0.7.0
 lyricsgenius
 google-generativeai
 openai==1.44.1

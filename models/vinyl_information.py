@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from pydantic import BaseModel
 from typing import Dict, List
 
-@dataclass
-class VinylInformation:
+class VinylInformation(BaseModel):
     artist: str
     album_name: str
     genre: str

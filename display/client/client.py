@@ -1,10 +1,10 @@
 import requests
+from models.vinyl_information import VinylInformation
 
-from .models import GlobalData
 
 class DisplayClient():
     @classmethod
-    def set_data(cls, data: GlobalData):
+    def set_data(cls, data: VinylInformation):
         try:
             response = requests.post("http://localhost:5000/data", json=data.model_dump())
             

@@ -6,6 +6,7 @@ from skimage.metrics import structural_similarity as ssim
 from detectors.gemini_detector import detect_vinyl
 from thread_utils import print_in_color
 from colorama import Fore
+from display.client import DisplayClient
 
 DEFAULT_INTERVAL = 7
 DEFAULT_QUERY_VINYL = False
@@ -25,7 +26,7 @@ def image_has_changed(img1_array, img2_array, threshold=0.70):
 def run_main_loop(query_vinyl : bool = DEFAULT_QUERY_VINYL, interval : int = DEFAULT_INTERVAL, color = None):
     if color is not None:
         globals()['print'] = print_in_color(color)
-    save_path = "captured_image.jpg"
+    save_path = "aa.jpg"
     
     # Initialize webcam
     cap = cv2.VideoCapture(0)
@@ -58,6 +59,9 @@ def run_main_loop(query_vinyl : bool = DEFAULT_QUERY_VINYL, interval : int = DEF
                     result = detect_vinyl(save_path)
                     if result is not None:
                         print(Fore.GREEN + result.album_name + " " + result.artist)
+                        DisplayClient.set_data(result)
+                    else:
+                        print('None')
 
             
             last_image_array = frame_rgb

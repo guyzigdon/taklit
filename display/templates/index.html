@@ -4,37 +4,85 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="3" />
     <title>Taklit</title>
+    <style>
+        #main {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .animated {
+            position: relative;
+            opacity: 0;
+            transform: translateY(300px);
+            transition: all 1.2s ease-out;
+        }
+
+        .animated.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 
 <body>
     <div id="main"></div>
     <script>
-        function init() {
-            fetch('/data')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (!data.album) {
-                        document.getElementById("main").innerHTML = "<h1>Waiting for input</h1>"
-                    } else {
-                        document.getElementById("main").innerHTML = `<h1>${data.album}</h1><h2>${data.artist}</h2>`
-                    }
-                })
-                .catch(error => {
-                    document.getElementById("main").textContent = `error: ${error}`
-                });
+        function getContainer() {
+            return document.getElementById("main");
         }
 
-        window.onload = init
+        function onEnd(text) {
+            getContainer().textContent = text
+        }
+
+        function onData(data) {
+            const tracklist = data.tracklist || []
+
+            const animatedContainer = document.createElement('div')
+            animatedContainer.classList.add("animated")
+            animatedContainer.innerHTML = `
+                <h1>${data.album_name}</h1>
+                <h2>${data.artist}</h2>
+                <h3>${data.year}</h3>
+                <h3>${data.genre}</h3>
+                <div>${tracklist.map(track => `<span>${track}</span>`).join("<br>")}</div>
+            `
+
+            const container = getContainer()
+            container.innerHTML = ""
+            container.appendChild(animatedContainer)
+
+            setTimeout(() => {
+                animatedContainer.classList.add('show');
+            }, 10); // Small delay to ensure transition triggers
+        }
+
+        // Create a WebSocket connection to the server
+        const socket = new WebSocket('ws://localhost:5000/ws');
+
+        // Event listener for when the connection is opened
+        socket.onopen = function (event) {
+            console.log('WebSocket connection established');
+        };
+
+
+        // Event listener for when the connection is closed
+        socket.onclose = function (event) {
+            onEnd('WebSocket connection closed');
+        };
+
+        // Event listener for WebSocket errors
+        socket.onerror = function (error) {
+            onEnd('WebSocket error: ', error);
+        };
+
+         // Event listener for receiving messages from the server
+         socket.onmessage = function(event) {
+            onData(JSON.parse(event.data))
+        };
     </script>
 </body>
-
-
 
 </html>
