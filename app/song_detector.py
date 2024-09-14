@@ -2,6 +2,8 @@ import sounddevice as sd
 from detectors.audio_detector import get_song_info
 from thread_utils import print_in_color
 import wavio
+import soundfile as sf
+import asyncio
 import argparse
 import time
 from colorama import Fore
@@ -14,8 +16,14 @@ OUTPUT_FILE_PREFIX = "recording_"
 
 
 def process_audio(data, filename):
-    print(f"Processing audio data. Saving to {filename}.")
-    wavio.write(filename, data, SAMPLE_RATE, sampwidth=2)
+    print(f"Processing audio data. Saving to {filename}.wav and {filename}.ogg.")
+
+    # Save as WAV using wavio
+    wavio.write(f"{filename}.wav", data, SAMPLE_RATE, sampwidth=2)
+
+    # Save as OGG using soundfile
+    sf.write(f"{filename}.ogg", data, SAMPLE_RATE, format='OGG')
+
 
 def record_audio():
     """
@@ -28,11 +36,12 @@ def record_audio():
     sd.wait()  # Wait until recording is finished
 
     # timestamp = time.strftime("%Y%m%d_%H%M%S")
-    filename = f"{OUTPUT_FILE_PREFIX}.wav"
+    filename = f"{OUTPUT_FILE_PREFIX}"
     process_audio(recording, filename)
     return filename
 
-def run_main_loop(interval : int = DEFAULT_INTERVAL, color= None):
+
+async def run_main_loop(interval: int = DEFAULT_INTERVAL, color=None):
     """
     Main loop to record audio at specified intervals.
     """
@@ -43,7 +52,7 @@ def run_main_loop(interval : int = DEFAULT_INTERVAL, color= None):
 
     while True:
         filename = record_audio()
-        result = get_song_info(filename)
+        result = await get_song_info(filename + ".ogg")
         if result is not None:
             print(Fore.GREEN + result.title + ", lyrics:")
             lyrics = "\n".join([row.text for row in result.get_current_and_next_lines() if row is not None])
@@ -57,4 +66,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Detect vinyl records using a webcam.')
     parser.add_argument('--interval', type=int, help='Interval between image captures in seconds', default=DEFAULT_INTERVAL, required=False)
     args = parser.parse_args()
-    run_main_loop(args.interval)
+    asyncio.run(run_main_loop(args.interval))
