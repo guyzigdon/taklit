@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, List
 import re
+import math 
 
 @dataclass
 class TimedRow:
@@ -55,13 +56,14 @@ class SongInformation:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
+            
             return (
                 self.title.lower() == other.title.lower() and
-                self.lyrics.lower() == other.lyrics.lower() and
                 self.album.lower() == other.album.lower() and
                 self.artist.lower() == other.artist.lower() and
-                self.current_time == other.current_time and
-                self.timed_lyrics == other.timed_lyrics
+                math.fabs(self.current_time - other.current_time) < 1 and
+                self.timed_lyrics == other.timed_lyrics and
+                (self.lyrics == None or other.lyrics == None or self.lyrics.lower() == other.lyrics.lower()) 
             )
         return False
     
