@@ -28,7 +28,6 @@ def detect_song_audd_io(file_path):
 
 shazam = Shazam()
 async def detect_song_shazamio(file_path):
-    import pdb; pdb.set_trace()
     shazam_result = await shazam.recognize(file_path)
     if shazam_result['matches'] == []:
         return None
@@ -42,7 +41,7 @@ async def detect_song_shazamio(file_path):
     album_info = await shazam.search_album(album_id)
     album_name= album_info['data'][0]['attributes']['name']    
 
-    song_info = SongInformation.from_json({"title": track['title'], "lyrics": None, "album": album_name, "artist": artist_name, "current_time": offset})
+    song_info = SongInformation(title=track['title'], lyrics=None, album=album_name, artist=artist_name, current_time=offset)
     return song_info
 
 LRCLIB_BASE_URL = 'https://lrclib.net'

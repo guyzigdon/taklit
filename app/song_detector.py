@@ -56,8 +56,10 @@ async def run_main_loop(interval: int = DEFAULT_INTERVAL, color=None):
         result = await get_song_info(filename + ".ogg")
         if result is not None:
             print(Fore.GREEN + result.title + ", lyrics:")
-            lyrics = "\n".join([row.text for row in result.get_current_and_next_lines() if row is not None])
-            if lyrics == "":
+            live_lyrics = result.live_lyrics
+            if live_lyrics is not None:
+                lyrics = "\n".join([row.text for row in result.live_lyrics if row is not None])
+            else:
                 lyrics = "\u266C"
             print(Fore.GREEN + lyrics)
             DisplayClient.set_data(result)

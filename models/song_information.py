@@ -36,11 +36,12 @@ class TimedLyrics(BaseModel):
 class SongInformation(BaseModel):
     data_type: str = "song"
     title: str
-    lyrics: str
     album: str
     artist: str
     current_time: float
+    lyrics: Optional[str] = None
     timed_lyrics: Optional[TimedLyrics] = None
+    live_lyrics: Optional[str] = None
 
     @classmethod
     def from_json(cls, json_data):
@@ -65,10 +66,10 @@ class SongInformation(BaseModel):
             )
         return False
     
-    def get_current_and_next_lines(self):
+    def set_current_and_next_lines(self):
         if self.timed_lyrics is None:
-            return None, None
+            self.live_lyrics = None
         for i, row in enumerate(self.timed_lyrics.rows):
             if row.start_time > self.current_time:
-                return self.timed_lyrics.rows[i - 1], row
-        return None, None
+                self.live_lyrics = [self.timed_lyrics.rows[i - 1].text, row.text]
+        self.live_lyrics = None

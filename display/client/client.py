@@ -10,7 +10,7 @@ class DisplayClient():
         try:
             response = requests.post(
                 "http://localhost:5000/data",
-                json=data_model.model_dump()
+                json=data_model.dict()
             )
             
             # Check if the response status code indicates success (200-299)
