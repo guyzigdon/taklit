@@ -1,4 +1,3 @@
-import threading
 import argparse
 
 from vinyl_detector import DEFAULT_QUERY_VINYL as DEFAULT_QUERY_VINYL
@@ -8,19 +7,31 @@ from song_detector import DEFAULT_INTERVAL as DEFAULT_SONG_INTERVAL
 from vinyl_detector import run_main_loop as run_vinyl_detector
 from song_detector import run_main_loop as run_song_detector
 from colorama import Fore, init
+import asyncio
+import concurrent.futures
+
 
 init(autoreset=True)
 
+def run_async_in_thread(loop, coro):
+    """
+    Runs an async function (coro) in a separate thread.
+    """
+    asyncio.set_event_loop(loop)  # Set the event loop for this thread
+    loop.run_until_complete(coro)
+
 def main(vinyl_dry_run, vinyl_interval, song_interval):
-    vinyl_thread = threading.Thread(target=run_vinyl_detector, args=(vinyl_dry_run, vinyl_interval, Fore.CYAN))
-    song_thread = threading.Thread(target=run_song_detector, args=(song_interval, Fore.BLUE))
-    
-    vinyl_thread.start()
-    song_thread.start()
+    song_loop = asyncio.new_event_loop()
+    vinyl_loop = asyncio.new_event_loop()    
 
-    vinyl_thread.join()
-    song_thread.join()
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Schedule both async tasks to run in separate threads
+        song_future = executor.submit(run_async_in_thread, song_loop, run_song_detector(song_interval, Fore.BLUE))
+        vinyl_future = executor.submit(run_async_in_thread, vinyl_loop, run_vinyl_detector(vinyl_dry_run, vinyl_interval, Fore.CYAN))
 
+        # Wait for both async functions to complete
+        song_future.result()
+        vinyl_future.result()
 
 
 if __name__ == '__main__':

@@ -65,7 +65,7 @@ def get_timed_lyrics(song_info : SongInformation):
     return None
     
 async def get_song_info(file_path):
-    song_info = await detect_song_shazamio('/home/guyz/Downloads/recording_.ogg')
+    song_info = await detect_song_shazamio(file_path)
     if song_info is None:
         return None
     timed_lyrics = get_timed_lyrics(song_info)
