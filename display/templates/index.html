@@ -1,0 +1,40 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="3" />
+    <title>Taklit</title>
+</head>
+
+<body>
+    <div id="main"></div>
+    <script>
+        function init() {
+            fetch('/data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.album) {
+                        document.getElementById("main").innerHTML = "<h1>Waiting for input</h1>"
+                    } else {
+                        document.getElementById("main").innerHTML = `<h1>${data.album}</h1><h2>${data.artist}</h2>`
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("main").textContent = `error: ${error}`
+                });
+        }
+
+        window.onload = init
+    </script>
+</body>
+
+
+
+</html>
