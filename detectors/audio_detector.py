@@ -29,6 +29,8 @@ def detect_song_audd_io(file_path):
 shazam = Shazam()
 async def detect_song_shazamio(file_path):
     shazam_result = await shazam.recognize(file_path)
+    if shazam_result['matches'] == []:
+        return None
     track = shazam_result['track']
     offset = shazam_result['matches'][0]['offset']
     artist_id = track['artists'][0]['adamid']
