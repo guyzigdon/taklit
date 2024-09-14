@@ -81,7 +81,7 @@ def run_main_loop(query_vinyl : bool = DEFAULT_QUERY_VINYL, interval : int = DEF
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Detect vinyl records using a webcam.')
-    parser.add_argument('--query_vinyl', action='store_true', help='Perform a dry run without querying gemini', default=DEFAULT_QUERY_VINYL, required=False)
+    parser.add_argument('--query-vinyl', action='store_true', help='Perform a dry run without querying gemini', default=DEFAULT_QUERY_VINYL, required=False)
     parser.add_argument('--interval', type=int, help='Interval between image captures in seconds', default=DEFAULT_INTERVAL, required=False)
     args = parser.parse_args()
     run_main_loop(args.query_vinyl, args.interval)

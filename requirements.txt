@@ -7,3 +7,5 @@ pillow
 scikit-image
 sounddevice
 wavio
+soundfile
+shazamio
