@@ -40,7 +40,7 @@ class SongInformation:
     lyrics: str
     album: str
     artist: str
-    current_time: int
+    current_time: float
     timed_lyrics: Optional[TimedLyrics] = None
 
     @classmethod
