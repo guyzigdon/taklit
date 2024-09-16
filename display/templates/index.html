@@ -54,12 +54,19 @@
         }
 
         function onSong(song) {
+            // Check if song is valid
+            if (!song || typeof song !== "object" || !song.title || !song.artist) {
+                console.error("Invalid song data:", song);
+                return;
+            }
+
             if (lyricsInterval) {
                 clearInterval(lyricsInterval);
             }
 
             updateLyrics(song);
 
+            // Keep updating lyrics every 2 seconds
             lyricsInterval = setInterval(() => {
                 updateLyrics(song);
             }, 2000);
@@ -69,38 +76,47 @@
             let currentLine = "No lyrics available";
             let nextLine = "";
 
-            if (song.timed_lyrics && song.timed_lyrics.rows.length > 0) {
+            // Check if timed_lyrics and its rows are available
+            if (song.timed_lyrics && Array.isArray(song.timed_lyrics.rows) && song.timed_lyrics.rows.length > 0) {
                 [currentLine, nextLine] = get_live_lyrics(song);
             }
 
             const songContainer = getContainer("song");
             songContainer.innerHTML = `
-                <h1>${song.title}</h1>
-                <h2>${song.artist}</h2>
+                <h1>${song.title || "Unknown Title"}</h1>
+                <h2>${song.artist || "Unknown Artist"}</h2>
                 <h3>Lyrics:</h3>
-                <h3>${currentLine}</h3>
+                <h2>${currentLine}</h2>
                 <h4>${nextLine}</h4>
                 <div></div>
             `;
         }
 
         function get_live_lyrics(song) {
-            let offset = song.current_time;
-            const time_elapsed = (Date.now() / 1000) - song.detection_time;
+            let offset = song.current_time || 0;
+            const time_elapsed = (Date.now() / 1000) - (song.detection_time || 0);
             offset += time_elapsed;
 
             return get_current_and_next_line(song, offset);
         }
 
         function get_current_and_next_line(song, offset) {
-            let currentLine = "";
-            let nextLine = "";
+            let currentLine = "No lyrics available";
+            let nextLine = "Next line unavailable";
+
+            // Ensure timed_lyrics is properly formatted
+            if (!song.timed_lyrics || !Array.isArray(song.timed_lyrics.rows)) {
+                console.error("Invalid timed_lyrics data:", song.timed_lyrics);
+                return [currentLine, nextLine];
+            }
+
+            // Loop through the lyrics to find the current and next lines
             for (let i = 0; i < song.timed_lyrics.rows.length; i++) {
                 if (song.timed_lyrics.rows[i].start_time > offset) {
-                    nextLine = song.timed_lyrics.rows[i].text || "Next line unavailable";
+                    nextLine = song.timed_lyrics.rows[i].text || nextLine;
                     break;
                 }
-                currentLine = song.timed_lyrics.rows[i].text || "Current line unavailable";
+                currentLine = song.timed_lyrics.rows[i].text || currentLine;
             }
 
             return [currentLine, nextLine];
@@ -111,14 +127,20 @@
             animatedContainer.classList.add("animated");
 
             let container;
-            if (data.data_type === "vinyl") {
+
+            // Validate data object and process accordingly
+            if (data && data.data_type === "vinyl") {
                 container = getContainer("vinyl");
                 animatedContainer.innerHTML = onVinyl(data);
-            } else {
+            } else if (data && data.data_type === "song") {
                 container = getContainer("song");
                 animatedContainer.innerHTML = onSong(data);
+            } else {
+                console.error("Unknown data type or invalid data:", data);
+                return;
             }
 
+            // Clear container and add animated content
             container.innerHTML = "";
             container.appendChild(animatedContainer);
 
@@ -142,12 +164,17 @@
 
         // Event listener for WebSocket errors
         socket.onerror = function (error) {
-            onEnd('WebSocket error: ', error);
+            onEnd('WebSocket error: ' + error);
         };
 
         // Event listener for receiving messages from the server
         socket.onmessage = function (event) {
-            onData(JSON.parse(event.data));
+            try {
+                const data = JSON.parse(event.data);
+                onData(data);
+            } catch (error) {
+                console.error("Failed to parse WebSocket message:", error);
+            }
         };
     </script>
 </body>
