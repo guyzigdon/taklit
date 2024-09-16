@@ -53,12 +53,13 @@ async def run_main_loop(interval: int = DEFAULT_INTERVAL, color=None):
 
     while True:
         filename = record_audio()
-        result = await get_song_info(filename + ".ogg")
+        result = await get_song_info(f"{filename}.ogg")
         if result is not None:
             print(Fore.GREEN + result.title + ", lyrics:")
+            result.set_current_and_next_lines()
             live_lyrics = result.live_lyrics
             if live_lyrics is not None:
-                lyrics = "\n".join([row.text for row in result.live_lyrics if row is not None])
+                lyrics = "\n".join([row for row in result.live_lyrics])
             else:
                 lyrics = "\u266C"
             print(Fore.GREEN + lyrics)

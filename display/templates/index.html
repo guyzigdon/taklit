@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,16 +31,18 @@
         <div id="song"></div>
     </div>
     <script>
+        let lyricsInterval; // Store interval reference
+
         function getContainer(name) {
             return document.getElementById(name);
         }
 
         function onEnd(text) {
-            getContainer("main").textContent = text
+            getContainer("main").textContent = text;
         }
 
         function onVinyl(vinyl) {
-            const tracklist = vinyl.tracklist || []
+            const tracklist = vinyl.tracklist || [];
 
             return `
                 <h1>${vinyl.album_name}</h1>
@@ -49,34 +50,83 @@
                 <h3>${vinyl.year}</h3>
                 <h3>${vinyl.genre}</h3>
                 <div>${tracklist.map(track => `<span>${track}</span>`).join("<br>")}</div>
-            `
+            `;
         }
 
         function onSong(song) {
-            return `
+            // Clear any existing interval to avoid multiple intervals running
+            if (lyricsInterval) {
+                clearInterval(lyricsInterval);
+            }
+
+            // Call updateLyrics immediately to show the first set of lyrics
+            updateLyrics(song);
+
+            // Set up an interval to update lyrics every 5 seconds (5000 ms)
+            lyricsInterval = setInterval(() => {
+                updateLyrics(song);
+            }, 5000);
+        }
+
+        function updateLyrics(song) {
+            let currentLine = "No lyrics available";
+            let nextLine = "";
+
+            // Ensure song has lyrics and get live lyrics only if available
+            if (song.timed_lyrics && song.timed_lyrics.rows.length > 0) {
+                [currentLine, nextLine] = get_live_lyrics(song);
+            }
+
+            const songContainer = getContainer("song");
+            songContainer.innerHTML = `
                 <h1>${song.title}</h1>
                 <h2>${song.artist}</h2>
-                <h3>${song.live_lyrics}</h3>
+                <h3>Lyrics:</h3>
+                <h3>${currentLine}</h3>
+                <h4>Next: ${nextLine}</h4>
                 <div></div>
-            `
+            `;
+        }
+
+        function get_live_lyrics(song) {
+            let offset = song.current_time;
+            const time_elapsed = (Date.now() / 1000) - song.detection_time; // Ensure detection_time is in seconds
+            offset += time_elapsed;
+            console.log("Offset: ", offset, "Current time: ", song.current_time, "Detection time: ", song.detection_time);
+
+            return get_current_and_next_line(song, offset);
+        }
+
+        function get_current_and_next_line(song, offset) {
+            let currentLine = "";
+            let nextLine = "";
+            // Loop through the lyrics to find the current and next line based on the time offset
+            for (let i = 0; i < song.timed_lyrics.rows.length; i++) {
+                if (song.timed_lyrics.rows[i].start_time > offset) {
+                    nextLine = song.timed_lyrics.rows[i].text || "Next line unavailable";
+                    break;
+                }
+                currentLine = song.timed_lyrics.rows[i].text || "Current line unavailable";
+            }
+
+            return [currentLine, nextLine];
         }
 
         function onData(data) {
-
-            const animatedContainer = document.createElement('div')
-            animatedContainer.classList.add("animated")
+            const animatedContainer = document.createElement('div');
+            animatedContainer.classList.add("animated");
 
             let container;
             if (data.data_type === "vinyl") {
-                container = getContainer("vinyl")
-                animatedContainer.innerHTML = onVinyl(data)
+                container = getContainer("vinyl");
+                animatedContainer.innerHTML = onVinyl(data);
             } else {
-                container = getContainer("song")
-                animatedContainer.innerHTML = onSong(data)
+                container = getContainer("song");
+                animatedContainer.innerHTML = onSong(data);
             }
 
-            container.innerHTML = ""
-            container.appendChild(animatedContainer)
+            container.innerHTML = "";
+            container.appendChild(animatedContainer);
 
             setTimeout(() => {
                 animatedContainer.classList.add('show');
@@ -91,7 +141,6 @@
             console.log('WebSocket connection established');
         };
 
-
         // Event listener for when the connection is closed
         socket.onclose = function (event) {
             onEnd('WebSocket connection closed');
@@ -102,9 +151,9 @@
             onEnd('WebSocket error: ', error);
         };
 
-         // Event listener for receiving messages from the server
-         socket.onmessage = function(event) {
-            onData(JSON.parse(event.data))
+        // Event listener for receiving messages from the server
+        socket.onmessage = function (event) {
+            onData(JSON.parse(event.data));
         };
     </script>
 </body>

@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 import re
 import math 
+import time
 
 class TimedRow(BaseModel):
     start_time: int # seconds
@@ -42,6 +43,7 @@ class SongInformation(BaseModel):
     lyrics: Optional[str] = None
     timed_lyrics: Optional[TimedLyrics] = None
     live_lyrics: Optional[str] = None
+    detection_time: Optional[int] = Field(default_factory=lambda: int(time.time()))
 
     @classmethod
     def from_json(cls, json_data):
@@ -69,7 +71,8 @@ class SongInformation(BaseModel):
     def set_current_and_next_lines(self):
         if self.timed_lyrics is None:
             self.live_lyrics = None
+            return
         for i, row in enumerate(self.timed_lyrics.rows):
             if row.start_time > self.current_time:
                 self.live_lyrics = [self.timed_lyrics.rows[i - 1].text, row.text]
-        self.live_lyrics = None
+                return
