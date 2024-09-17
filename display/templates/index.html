@@ -4,31 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Taklit</title>
-    <style>
-        #main {
-            display: flex;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .animated {
-            position: relative;
-            opacity: 0;
-            transform: translateY(300px);
-            transition: all 1.2s ease-out;
-        }
-
-        .animated.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> 
 </head>
 
 <body>
     <div id="main">
         <div id="vinyl"></div>
         <div id="song"></div>
+        <div id="square"></div> <!-- Small square -->
     </div>
     <script>
         let lyricsInterval;
@@ -47,9 +30,9 @@
             return `
                 <h1>${vinyl.album_name}</h1>
                 <h2>${vinyl.artist}</h2>
-                <h3>${vinyl.year}</h3>
-                <h3>${vinyl.genre}</h3>
-                <div>${tracklist.map(track => `<span>${track}</span>`).join("<br>")}</div>
+                <h3 class="genre">${vinyl.genre}</h3>
+                <h3 class="year">${vinyl.year}</h3>
+                <div class="tracklist">${tracklist.map(track => `<h4>${track}</h4>`).join('')}</div>
             `;
         }
 
@@ -66,7 +49,6 @@
 
             updateLyrics(song);
 
-            // Keep updating lyrics every 2 seconds
             lyricsInterval = setInterval(() => {
                 updateLyrics(song);
             }, 2000);
@@ -76,7 +58,6 @@
             let currentLine = "No lyrics available";
             let nextLine = "";
 
-            // Check if timed_lyrics and its rows are available
             if (song.timed_lyrics && Array.isArray(song.timed_lyrics.rows) && song.timed_lyrics.rows.length > 0) {
                 [currentLine, nextLine] = get_live_lyrics(song);
             }
@@ -84,11 +65,8 @@
             const songContainer = getContainer("song");
             songContainer.innerHTML = `
                 <h1>${song.title || "Unknown Title"}</h1>
-                <h2>${song.artist || "Unknown Artist"}</h2>
-                <h3>Lyrics:</h3>
-                <h2>${currentLine}</h2>
+                <h2 class="current-line">${currentLine}</h2> <!-- Use current-line class -->
                 <h4>${nextLine}</h4>
-                <div></div>
             `;
         }
 
@@ -104,13 +82,11 @@
             let currentLine = "No lyrics available";
             let nextLine = "Next line unavailable";
 
-            // Ensure timed_lyrics is properly formatted
             if (!song.timed_lyrics || !Array.isArray(song.timed_lyrics.rows)) {
                 console.error("Invalid timed_lyrics data:", song.timed_lyrics);
                 return [currentLine, nextLine];
             }
 
-            // Loop through the lyrics to find the current and next lines
             for (let i = 0; i < song.timed_lyrics.rows.length; i++) {
                 if (song.timed_lyrics.rows[i].start_time > offset) {
                     nextLine = song.timed_lyrics.rows[i].text || nextLine;
@@ -128,7 +104,6 @@
 
             let container;
 
-            // Validate data object and process accordingly
             if (data && data.data_type === "vinyl") {
                 container = getContainer("vinyl");
                 animatedContainer.innerHTML = onVinyl(data);
@@ -140,13 +115,12 @@
                 return;
             }
 
-            // Clear container and add animated content
             container.innerHTML = "";
             container.appendChild(animatedContainer);
 
             setTimeout(() => {
                 animatedContainer.classList.add('show');
-            }, 10); // Small delay to ensure transition triggers
+            }, 10);
         }
 
         // Create a WebSocket connection to the server

@@ -1,0 +1,115 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 80%;
+    max-width: 1200px;
+    position: relative;
+}
+
+#vinyl, #song {
+    width: 50%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border-radius: 8px;
+    margin: 0 10px;
+}
+
+.animated {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animated.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.genre {
+    color: #290020;
+}
+
+.year {
+    color: #2e002c;
+}
+
+.tracklist {
+    color: #001d49;
+}
+
+.current-line {
+    color: #008040;
+    animation: pulse 2s infinite;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+h1 {
+    font-size: 2em;
+    color: #333;
+    margin: 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    color: #666;
+    margin: 5px 0;
+}
+
+h3 {
+    font-size: 1.2em;
+    color: #999;
+    margin: 5px 0;
+}
+
+h4 {
+    font-size: 1em;
+    margin: 5px 0;
+}
+
+span {
+    display: block;
+    margin: 5px 0;
+}
+
+#square {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;  
+    height: 100px; 
+    border: 5px solid #007bff; 
+    background-color: transparent; 
+    border-radius: 8px;
+}
