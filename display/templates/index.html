@@ -26,7 +26,7 @@
 
         function onVinyl(vinyl) {
             const tracklist = vinyl.tracklist || [];
-
+            // TODO: highlight current song in tracklist
             return `
                 <h1>${vinyl.album_name}</h1>
                 <h2>${vinyl.artist}</h2>
@@ -72,7 +72,7 @@
 
         function get_live_lyrics(song) {
             let offset = song.current_time || 0;
-            const time_elapsed = (Date.now() / 1000) - (song.detection_time || 0);
+            const time_elapsed = (Date.now() / 1000) + 5 - (song.detection_time || 0);
             offset += time_elapsed;
 
             return get_current_and_next_line(song, offset);
