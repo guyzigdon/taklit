@@ -69,13 +69,16 @@ def get_timed_lyrics_lrclib(song_info : SongInformation):
 
 sp = Spotify("AQDLe2rrX0Q_vMiaUAjciWTTHHeZi46nlSswgdsPeGDJAOROrYsCiUleBKB3a9buSl9CrT8--4bEvR5Brup56rK8EWJp1d79oCQBLlDiGYJ3eGjiexT--n8Wu6ouoP9XbrBAvVDHvjl8x2jefAMxFlUhO9xpoEE")
 def get_timed_lyrics_spotify(song_info : SongInformation):
-
-    # TODO handle errors, maybe use lrclib as a fallback
     if song_info is None:
         return None
     
-    spotify_track_id = sp.search(q=f'{song_info.title} {song_info.artist}', type='track', limit=1)['tracks']['items'][0]['id']
-    lyrics = sp.get_lyrics(spotify_track_id)['lyrics']
+    # for somw reson the search query is no good when limit is 1
+    spotify_track_id = sp.search(q=f'{song_info.title} {song_info.artist}', type='track', limit=10)['tracks']['items'][0]['id']
+    response = sp.get_lyrics(spotify_track_id)
+    if response is None:
+        print('could not get lyrics for track {}'.format(spotify_track_id))
+        return None
+    lyrics = response['lyrics']
     timed_lyrics = TimedLyrics.from_spotify_lyrics(lyrics)
     return timed_lyrics
 
@@ -86,6 +89,8 @@ async def get_song_info(file_path):
         print('None')
         return None
     timed_lyrics = get_timed_lyrics_spotify(song_info)
+    if timed_lyrics is None:
+        timed_lyrics = get_timed_lyrics_lrclib(song_info)
     song_info.timed_lyrics = timed_lyrics
     return song_info
     
