@@ -1,6 +1,7 @@
 import requests
 from models.song_information import SongInformation, TimedLyrics
 from shazamio import Shazam
+from syrics.api import Spotify
 
 audd_io_api_token = '49cc751b8e9de310756bbed451098b8f'
 def detect_song_audd_io(file_path):
@@ -40,7 +41,6 @@ async def detect_song_shazamio(file_path):
     artist_name = artist_info['data'][0]['attributes']['name']
     album_info = await shazam.search_album(album_id)
     album_name= album_info['data'][0]['attributes']['name']    
-
     song_info = SongInformation(title=track['title'], lyrics=None, album=album_name, artist=artist_name, current_time=offset)
     return song_info
 
@@ -51,7 +51,7 @@ def get_search_query(song_info : SongInformation):
         return None
     return [f'{LRCLIB_BASE_URL}/api/search?q={song_info.title}+{song_info.artist}+{song_info.album}', f'{LRCLIB_BASE_URL}/api/search?q={song_info.title}']
 
-def get_timed_lyrics(song_info : SongInformation):
+def get_timed_lyrics_lrclib(song_info : SongInformation):
     search_query = get_search_query(song_info)
     if search_query is None:
         return None
@@ -65,13 +65,27 @@ def get_timed_lyrics(song_info : SongInformation):
         except Exception as e:
             print(e, response)
     return None
+
+
+sp = Spotify("AQDLe2rrX0Q_vMiaUAjciWTTHHeZi46nlSswgdsPeGDJAOROrYsCiUleBKB3a9buSl9CrT8--4bEvR5Brup56rK8EWJp1d79oCQBLlDiGYJ3eGjiexT--n8Wu6ouoP9XbrBAvVDHvjl8x2jefAMxFlUhO9xpoEE")
+def get_timed_lyrics_spotify(song_info : SongInformation):
+
+    # TODO handle errors, maybe use lrclib as a fallback
+    if song_info is None:
+        return None
+    
+    spotify_track_id = sp.search(q=f'{song_info.title} {song_info.artist}', type='track', limit=1)['tracks']['items'][0]['id']
+    lyrics = sp.get_lyrics(spotify_track_id)['lyrics']
+    timed_lyrics = TimedLyrics.from_spotify_lyrics(lyrics)
+    return timed_lyrics
+
     
 async def get_song_info(file_path):
     song_info = await detect_song_shazamio(file_path)
     if song_info is None:
         print('None')
         return None
-    timed_lyrics = get_timed_lyrics(song_info)
+    timed_lyrics = get_timed_lyrics_spotify(song_info)
     song_info.timed_lyrics = timed_lyrics
     return song_info
     
