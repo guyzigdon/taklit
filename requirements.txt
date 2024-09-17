@@ -13,3 +13,4 @@ sounddevice
 wavio
 soundfile
 shazamio
+syrics

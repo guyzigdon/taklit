@@ -42,6 +42,7 @@ def test_detect_song():
         TimedRow(start_time=73, text='Will you meet me in the middle, will you meet me in the air?'),
         TimedRow(start_time=80, text='Will you love me just a little, just enough to show you care?'),
         TimedRow(start_time=87, text="Well, I tried to fake it, I don't mind saying, I just can't make it"),
+        TimedRow(start_time=95, text='♪'),
         TimedRow(start_time=113, text="Well, I keep on thinking 'bout you, Sister Golden Hair surprise"),
         TimedRow(start_time=119, text="And I just can't live without you, can't you see it in my eyes?"),
         TimedRow(start_time=126, text='Now I been one poor correspondent, and I been too, too hard to find'),
@@ -56,7 +57,8 @@ def test_detect_song():
         TimedRow(start_time=175, text='Doo wop doo wop, doo wop doo wop'),
         TimedRow(start_time=178, text='Doo wop doo wop, doo wop doo wop'),
         TimedRow(start_time=182, text='Doo wop doo wop, doo wop doo wop'),
-        TimedRow(start_time=185, text='Doo wop doo wop, doo wop doo wop')
+        TimedRow(start_time=185, text='Doo wop doo wop, doo wop doo wop'),
+        TimedRow(start_time=188, text='')
     ])
     expected = SongInformation(title="Sister Golden Hair",
                                artist= "America",

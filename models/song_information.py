@@ -27,6 +27,10 @@ class TimedLyrics(BaseModel):
         
         return cls(rows=rows)
     
+    @classmethod
+    def from_spotify_lyrics(cls, lyrics):
+        return cls(rows=[TimedRow(start_time=int(line['startTimeMs'])/1000, text=line['words']) for line in lyrics['lines']])
+    
     def __eq__(self, other):
         for i, row in enumerate(self.rows):
             if row != other.rows[i]:
