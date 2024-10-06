@@ -11,8 +11,8 @@ from display.client import DisplayClient
 
 # Configuration
 SAMPLE_RATE = 44100  # Sample rate in Hz
-DURATION = 5  # Duration of each recording in seconds
-DEFAULT_INTERVAL = 10  # Interval between recordings in seconds
+DURATION = 3  # Duration of each recording in seconds
+DEFAULT_INTERVAL = 5  # Interval between recordings in seconds
 OUTPUT_FILE_PREFIX = "recording_"
 
 

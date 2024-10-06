@@ -8,7 +8,7 @@ from thread_utils import print_in_color
 from colorama import Fore
 from display.client import DisplayClient
 
-DEFAULT_INTERVAL = 7
+DEFAULT_INTERVAL = 5
 DEFAULT_QUERY_VINYL = False
 
 
